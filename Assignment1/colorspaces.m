@@ -12,10 +12,11 @@ switch(colorspace)
 		O2 = (R+G-(2*B))./(sqrt(6));
 		O3 = (R+G+B)./sqrt(3);
 		conv_img = cat(3, O1, O2, O3);
-   case 'rgb' 
-		r = (R)/(R+B+G);
-		g = (G)/(R+B+G);
-		b = (B)/(R+B+G);
+   case 'rgb'
+		total = R+G+B;
+		r = double(R./total);
+		g = double(G./total);
+		b = double(B./total);
 		conv_img = cat(3, r,g,b);
    case 'HSV' 
 		conv_img = rgb2hsv(img);
