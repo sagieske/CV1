@@ -24,7 +24,9 @@ switch(colorspace)
      fprintf('Unknown colorspace\n' );
    end
 
+% needed to show only 1 channel
 empty = zeros(size(img,1), size(img,2));
+% create images for seperate channels
 image(cat(3, conv_img(:,:,1), empty, empty)); title('channel #1');
 figure, image(cat(3, empty, conv_img(:,:,2), empty)); title('channel #2');
 figure, image(cat(3,empty, empty, conv_img(:,:,3))); title('channel #3');
