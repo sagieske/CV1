@@ -45,7 +45,7 @@ for i = 1:length,
         g = norm(gxy);
         normal(i,j) = g;
         N =  gxy./g;
-        normal_mat(i,j) = N;
+        normal_mat(i,j,:) = N;
         p = N(1)/N(3);
         q = N(2)/N(3);
 	Q(i,j) = q;
@@ -73,10 +73,13 @@ for i=1:length,
 		Z(i,j) = Z(i,j-1) + P(i,j);
 	end
 end
+
 x = 1:10:length;
 y = 1:10:width;
 
 [X,Y] = meshgrid(x,y)
-
+figure('Name', 'Surface Normal Vectors', 'NumberTitle', 'off')
+quiver3(X, Y, Z, N(:,:,1), N(:,:,2), N(:,:,3))
+daspect([1,1,1])
 
 %quiver3(X,Y,N(:,:,1),N(:,:,2), N(:,:,3))
