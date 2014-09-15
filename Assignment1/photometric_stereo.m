@@ -5,13 +5,15 @@ im2 = imread('sphere2.png');
 im3 = imread('sphere3.png');
 im4 = imread('sphere4.png');
 im5 = imread('sphere5.png');
+
+image(im2);
 %Assume matrix V
 V = [
     0.0, 0.0, 1.0;
-    1.0, -1.0, 1.0;
-    -1.0, -1.0, 1.0;
+    -1.0, 1.0, 1.0;
     1.0, 1.0, 1.0;
-    -1.0, 1.0, 1.0
+    -1.0, -1.0, 1.0;
+    1.0, -1.0, 1.0
     ];
 %To nullify shades
 Sxy = zeros(5,5);
@@ -24,6 +26,7 @@ Sxy = zeros(5,5);
 %P = zeros(length, width);
 ixy = zeros(1,5);
 gxy = zeros(1,5);
+normal = zeros(length,width);
 for i = 1:length,
     for j = 1:width,
         ixy = [im1(i,j); im2(i,j); im3(i,j); im4(i,j); im5(i,j)];
@@ -35,22 +38,20 @@ for i = 1:length,
        % ixy2 = double(Sxy)*double(ixy);
         %V2 = double(Sxy)*double(V);
          %G(i,j,:) = double(V)\double(holder);
-        gxy = linsolve(double(V),double(ixy));
-        g = norm(gxy)
-        N =  gxy./g
-        p = N(1)/N(3)
-        q = N(2)/N(3)
+        gxy = linsolve(double(V), double(ixy));
+        g = norm(gxy);
+        normal(i,j) = g;
+        N =  gxy./g;
+        p = N(1)/N(3);
+        q = N(2)/N(3);
          % CHECK
          %N(i,j,:) = (1/norm(G(i,j)))* G(i,j,:);
          %P(i,j) = N(i,j,1)/N(i,j,3);
          %Q(i,j) = N(i,j,2)/N(i,j,3);
     end
 end
+image(normal);
 
-ixy = [im1(200,200); im2(200,200); im3(200,200); im4(200,200); im5(200,200)]
-gxy = double(V)\double(ixy)
-g = norm(gxy)
-%plot(G,1000)
 %x = 1:length;
 %y = 1:width;
 %[X,Y] = meshgrid(x,y);
