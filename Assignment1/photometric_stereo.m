@@ -6,7 +6,7 @@ im3 = imread('sphere3.png');
 im4 = imread('sphere4.png');
 im5 = imread('sphere5.png');
 
-image(im2);
+
 %Assume matrix V
 V = [
     0.0, 0.0, 1.0;
@@ -58,6 +58,7 @@ end
 % Create height map
 Z = zeros(length, width);
 % set initial height for each pixel in left column
+Z(1,1) = 0.0;
 for i=2:length,
    Z(i,1) = Z(i-1,1) + Q(i,1);
 end
@@ -67,14 +68,12 @@ for i=1:length,
 	end
 end
 
-Z(1:10,1:10)
 
 x = 1:length;
 y = 1:width;
 
-[X,Y] = meshgrid(x,y)
-figure('Name', 'Surface Normal Vectors', 'NumberTitle', 'off')
-quiver3(X, Y, Z, N(:,:,1), N(:,:,2), N(:,:,3))
-daspect([1,1,1])
+[X,Y] = meshgrid(x,y);
+quiver3(X, Y, Z, N(:,:,1), N(:,:,2), N(:,:,3));
+%daspect([1,1,1])
 
 %quiver3(X,Y,N(:,:,1),N(:,:,2), N(:,:,3))
