@@ -28,6 +28,7 @@ P = zeros(length, width);
 ixy = zeros(1,5);
 gxy = zeros(1,5);
 normal = zeros(length,width);
+Normal_mat = zeros(length,width,3);
 for i = 1:length,
     for j = 1:width,
         ixy = [im1(i,j); im2(i,j); im3(i,j); im4(i,j); im5(i,j)];
@@ -45,6 +46,7 @@ for i = 1:length,
         N =  gxy./g;
         P(i,j) = N(1)/N(3);
         Q(i,j) = N(2)/N(3);
+        normal_mat(i,j) = N;
          % CHECK
          %N(i,j,:) = (1/norm(G(i,j)))* G(i,j,:);
          %P(i,j) = N(i,j,1)/N(i,j,3);
@@ -65,8 +67,13 @@ for i=2:length,
 end
 for i=1:length,
 	for j=2:width,
-		Z(i,j) = Z(i,j-1) + P(i,j)
+		Z(i,j) = Z(i,j-1) + P(i,j);
 	end
 end
+x = 1:10:length;
+y = 1:10:width;
+
+[X,Y] = meshgrid(x,y)
+
 
 %quiver3(X,Y,N(:,:,1),N(:,:,2), N(:,:,3))
