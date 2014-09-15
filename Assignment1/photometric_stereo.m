@@ -1,76 +1,90 @@
 function trap = photometric_stereo
-%Load 5 images into matrices
+
+%Load 5 images into matrices.
+%im2double is not available on this version of matlab
 im1 = imread('sphere1.png');
 im2 = imread('sphere2.png');
 im3 = imread('sphere3.png');
 im4 = imread('sphere4.png');
 im5 = imread('sphere5.png');
 
+%Create distance scalar for easy editing of 
+%light source matrix V
+d = 1;
 
-%Assume matrix V
+%Create light source matrix V
 V = [
-    0.0, 0.0, 1.0;
-    -1.0, 1.0, 1.0;
-    1.0, 1.0, 1.0;
-    -1.0, -1.0, 1.0;
-    1.0, -1.0, 1.0
+    %light source straight ahead
+    0, 0, d;
+    %light source upper left corner
+    -d, d, d;
+    %light source upper right corner
+    d, d, d;
+    %light source lower left corner
+    -d, -d, d;
+    %light source lower right corner
+    d, -d, d
     ];
-%To nullify shades
-Sxy = zeros(5,5);
-%Save images length and width in pixels
+
+%Store the length and width of the images
+%to save time re-calculating
 [length,width] = size(im1);
-%
-%G = zeros(length, width, 3);
-%holder = zeros(1, 5);
-N = zeros(length, width,3);
-Q = zeros(length, width);
+
+%Intensity vector to save pixel intensities for
+%one pixel in all 5 images
+i = zeros(1,5);
+
+%Matrix to save albedo for every pixel i,j
+A = zeros(length,width);
+
+%matrix to save normal vector for every pixel i,j
+N = zeros(length,width,3);
+
+%Matrix to save difference in width for every pixel i,j
 P = zeros(length, width);
-ixy = zeros(1,5);
-%gxy = zeros(1,5);
-%gxp(1,3)
 
-albedo = zeros(length,width);
-Normal_mat = zeros(length,width,3);
+%Matrix to save difference in width for every pixel i,j
+Q = zeros(length, width);
 
+%Note: no matrix I is used to offset shading, as solving
+%the linear equation would cancel out I. Thus, it is left 
+%out to save processing time
+
+%Double for loop to access every pixel i,j
 for i = 1:length,
     for j = 1:width,
-        ixy = [im1(i,j); im2(i,j); im3(i,j); im4(i,j); im5(i,j)];
-        Sxy = [im1(i,j),0,0,0,0;
-            0,im2(i,j),0,0,0;
-            0,0,im3(i,j),0,0;
-            0,0,0,im4(i,j),0;
-            0,0,0,0,im5(i,j)];
-       % ixy2 = double(Sxy)*double(ixy);
-        %V2 = double(Sxy)*double(V);
-         %G(i,j,:) = double(V)\double(holder);
-        gxy = linsolve(double(V), double(ixy));
-        g = norm(gxy);
-        albedo(i,j) = g;
-	value =  gxy./g;
+        %Save the pixel values in each image for i,j in vector i
+        ivector = [im1(i,j); im2(i,j); im3(i,j); im4(i,j); im5(i,j)];
 
+        %To determine vector g, the linear equation i = Vg 
+        %is solved. Both V and vector i are cast to double for linsolve
+        %to work.
+        g = linsolve(double(V), double(ivector));
+        
+        %The norm of vector g is the albedo of pixel i,j
+        a = norm(g);
 
-	if (g == 0)
-		normal_mat(i,j,:) = [0;0;0;];
-		P(i,j) = 0;
-		Q(i,j) = 0;
-	else
-		normal_mat(i,j,:) = gxy./g;
-		P(i,j) = normal_mat(i,j,1)/ normal_mat(i,j,3);
-		Q(i,j) = normal_mat(i,j,2)/normal_mat(i,j,3);
-	end 
+        %Store the albedo in the albedo-matrix
+        A(i,j) = a;
 
-	value(isnan(value)) = 0;
-	normal_mat(i,j,:) = value;
-	%normal_mat(isnan(normal_mat)) = 0;
-    %P(i,j) = normal_mat(i,j,1)/ normal_mat(i,j,3);
-	%P(i,j)(isnan( P(i,j))) = 0;
-    %Q(i,j) = normal_mat(i,j,2)/normal_mat(i,j,3);
-	%Q(i,j)(isnan( Q(i,j))) = 0;
-         % CHECK
-         %N(i,j,:) = (1/norm(G(i,j)))* G(i,j,:);
+        %Since some pixel values are 0, g and thus its norm, a,
+        %can be 0 too. However, division by 0 leads to NaNs and
+        %thus unusable values. So, if a=0, the normal vector is the
+        %1x3 0-vector, and p and q are both 0. If a is not 0,
+        %the normal vector is determined by dividing the vector g
+        %by its norm, and P and Q are given by N1/N3 and N2/N3,
+        %respectively
+        if (a == 0)
+            N(i,j,:) = [0;0;0;];
+    		P(i,j) = 0;
+        	Q(i,j) = 0;
+        else
+            N(i,j,:) = g./a;
+            P(i,j) = N(i,j,1)/ N(i,j,3);
+            Q(i,j) = N(i,j,2)/N(i,j,3);
+        end 
     end
 end
-%image(normal);
 
 % Create height map
 Z = zeros(length, width);
@@ -79,30 +93,59 @@ Z(1,1) = 0.0;
 for i=2:length,
    Z(i,1) = Z(i-1,1) + Q(i,1);
 end
+
 for i=1:length,
 	for j=2:width,
 		Z(i,j) = Z(i,j-1) + P(i,j);
 	end
 end
 
-% create mesh grid
-x = 1:length;
-y = 1:width;
-[X,Y] = meshgrid(x,y);
+%Before quiver3 can be used, a meshgrid must first be created.
+%This meshgrid runs from over the entire image length and width
+%in steps of 10.
+[x,y] = meshgrid(1:10:width, 1:10:length);
 
-height_matrix = zeros(size(X,1), size(X,2));
-normals = zeros(size(X,1), size(X,2),3);
+%Now, a height map must be made to store the height of the image.
+%The most left column is filled by setting the height value to the
+%that of the previous pixel + the difference in y for the current pixel.
+%Then, each row is filled by setting the height value to that of the 
+%previous pixel + the difference in x for the current pixel
 
-for x = 1:length,
-	for y=1:width,
-		i = X(x,y);
-		j = Y(x,y);
-		height_matrix(x,y) = Z(i,j);
-		normals(x,y,:) = normal_mat(i,j,:)
+%The height map has the size of the original images
+Z = zeros(length, width);
+
+%The upper left pixel has height 0
+Z(1,1) = 0;
+
+%Filling the entire most left column
+for i=2:length,
+   Z(i,1) = Z(i-1,1) + Q(i,1);
+end
+
+%Filling the rest of the matrix
+for i=1:length,
+	for j=2:width,
+		Z(i,j) = Z(i,j-1) + P(i,j);
 	end
 end
 
-quiver3(X, Y, Z, normals(:,:,1), normals(:,:,2), normals(:,:,3));
-%daspect([1,1,1])
+%Now, the height map Z and the unit vector matrix N need to be scaled 
+%to the size of the meshgrid, which is 10x smaller than the original image
+
+Z10 = zeros(size(x,1), size(x,2));
+N10 = zeros(size(x,1), size(x,2),3);
+
+for l = 1:size(x,1),
+	for w = 1:size(x,2),
+		i = x(l,w);
+		j = y(l,w);
+		Z10(l,w) = Z(i,j);
+		N10(l,w,:) = N(i,j,:);
+	end
+end
+
+%Plotting the normal vectors
+quiver3(x, y, Z10, N10(:,:,1), N10(:,:,2), N10(:,:,3));
+
 
 %quiver3(X,Y,N(:,:,1),N(:,:,2), N(:,:,3))
