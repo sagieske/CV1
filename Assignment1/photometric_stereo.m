@@ -22,8 +22,7 @@ Sxy = zeros(5,5);
 %
 %G = zeros(length, width, 3);
 %holder = zeros(1, 5);
-%N = zeros(length, width,3);
-%P = zeros(length, width);
+N = zeros(length, width,3);
 Q = zeros(length, width);
 P = zeros(length, width);
 ixy = zeros(1,5);
@@ -44,19 +43,16 @@ for i = 1:length,
         gxy = linsolve(double(V), double(ixy));
         g = norm(gxy);
         normal(i,j) = g;
-        N =  gxy./g;
-        normal_mat(i,j,:) = N;
-        p = N(1)/N(3);
-        q = N(2)/N(3);
-	Q(i,j) = q;
-	P(i,j) = p;
+        normal_mat(i,j,:) = gxy./g;
+        P(i,j) = N(1)/N(3);
+        Q(i,j) = N(2)/N(3);
          % CHECK
          %N(i,j,:) = (1/norm(G(i,j)))* G(i,j,:);
          %P(i,j) = N(i,j,1)/N(i,j,3);
          %Q(i,j) = N(i,j,2)/N(i,j,3);
     end
 end
-image(normal);
+%image(normal);
 
 %x = 1:length;
 %y = 1:width;
