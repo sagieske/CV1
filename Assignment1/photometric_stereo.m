@@ -35,8 +35,11 @@ for i = 1:length,
        % ixy2 = double(Sxy)*double(ixy);
         %V2 = double(Sxy)*double(V);
          %G(i,j,:) = double(V)\double(holder);
-        gxy = double(V)\double(ixy);
-        g = norm(gxy);
+        gxy = linsolve(double(V),double(ixy));
+        g = norm(gxy)
+        N =  gxy./g
+        p = N(1)/N(3)
+        q = N(2)/N(3)
          % CHECK
          %N(i,j,:) = (1/norm(G(i,j)))* G(i,j,:);
          %P(i,j) = N(i,j,1)/N(i,j,3);
