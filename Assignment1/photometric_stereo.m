@@ -43,20 +43,17 @@ for i = 1:length,
         gxy = linsolve(double(V), double(ixy));
         g = norm(gxy);
         normal(i,j) = g;
-        normal_mat(i,j,:) = gxy./g;
-        P(i,j) = N(1)/N(3);
-        Q(i,j) = N(2)/N(3);
+	value =  gxy./g;
+	value(isnan(value)) = 0;
+	normal_mat(i,j,:) = value;
+	%normal_mat(isnan(normal_mat)) = 0;
+        P(i,j) = normal_mat(i,j,1)/ normal_mat(i,j,3);
+        Q(i,j) = normal_mat(i,j,2)/normal_mat(i,j,3);
          % CHECK
          %N(i,j,:) = (1/norm(G(i,j)))* G(i,j,:);
-         %P(i,j) = N(i,j,1)/N(i,j,3);
-         %Q(i,j) = N(i,j,2)/N(i,j,3);
     end
 end
 %image(normal);
-
-%x = 1:length;
-%y = 1:width;
-%[X,Y] = meshgrid(x,y);
 
 % Create height map
 Z = zeros(length, width);
@@ -70,8 +67,10 @@ for i=1:length,
 	end
 end
 
-x = 1:10:length;
-y = 1:10:width;
+Z(1:10,1:10)
+
+x = 1:length;
+y = 1:width;
 
 [X,Y] = meshgrid(x,y)
 figure('Name', 'Surface Normal Vectors', 'NumberTitle', 'off')
