@@ -26,9 +26,12 @@ N = zeros(length, width,3);
 Q = zeros(length, width);
 P = zeros(length, width);
 ixy = zeros(1,5);
-gxy = zeros(1,5);
-normal = zeros(length,width);
+%gxy = zeros(1,5);
+%gxp(1,3)
+
+albedo = zeros(length,width);
 Normal_mat = zeros(length,width,3);
+
 for i = 1:length,
     for j = 1:width,
         ixy = [im1(i,j); im2(i,j); im3(i,j); im4(i,j); im5(i,j)];
@@ -42,13 +45,27 @@ for i = 1:length,
          %G(i,j,:) = double(V)\double(holder);
         gxy = linsolve(double(V), double(ixy));
         g = norm(gxy);
-        normal(i,j) = g;
+        albedo(i,j) = g;
 	value =  gxy./g;
+
+
+	if (g == 0)
+		normal_mat(i,j,:) = [0;0;0;];
+		P(i,j) = 0;
+		Q(i,j) = 0;
+	else
+		normal_mat(i,j,:) = gxy./g;
+		P(i,j) = normal_mat(i,j,1)/ normal_mat(i,j,3);
+		Q(i,j) = normal_mat(i,j,2)/normal_mat(i,j,3);
+	end 
+
 	value(isnan(value)) = 0;
 	normal_mat(i,j,:) = value;
 	%normal_mat(isnan(normal_mat)) = 0;
-        P(i,j) = normal_mat(i,j,1)/ normal_mat(i,j,3);
-        Q(i,j) = normal_mat(i,j,2)/normal_mat(i,j,3);
+    %P(i,j) = normal_mat(i,j,1)/ normal_mat(i,j,3);
+	%P(i,j)(isnan( P(i,j))) = 0;
+    %Q(i,j) = normal_mat(i,j,2)/normal_mat(i,j,3);
+	%Q(i,j)(isnan( Q(i,j))) = 0;
          % CHECK
          %N(i,j,:) = (1/norm(G(i,j)))* G(i,j,:);
     end
@@ -68,12 +85,24 @@ for i=1:length,
 	end
 end
 
-
+% create mesh grid
 x = 1:length;
 y = 1:width;
-
 [X,Y] = meshgrid(x,y);
-quiver3(X, Y, Z, N(:,:,1), N(:,:,2), N(:,:,3));
+
+height_matrix = zeros(size(X,1), size(X,2));
+normals = zeros(size(X,1), size(X,2),3);
+
+for x = 1:length,
+	for y=1:width,
+		i = X(x,y);
+		j = Y(x,y);
+		height_matrix(x,y) = Z(i,j);
+		normals(x,y,:) = normal_mat(i,j,:)
+	end
+end
+
+quiver3(X, Y, Z, normals(:,:,1), normals(:,:,2), normals(:,:,3));
 %daspect([1,1,1])
 
 %quiver3(X,Y,N(:,:,1),N(:,:,2), N(:,:,3))
