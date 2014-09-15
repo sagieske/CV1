@@ -18,7 +18,7 @@ switch(colorspace)
 		g = double(G./total);
 		b = double(B./total);
 		conv_img = cat(3, r,g,b);
-   case co 'HSV' 
+   case 'HSV' 
 		conv_img = rgb2hsv(img);
    otherwise
      fprintf('Unknown colorspace\n' );
