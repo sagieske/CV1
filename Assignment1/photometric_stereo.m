@@ -24,6 +24,8 @@ Sxy = zeros(5,5);
 %holder = zeros(1, 5);
 %N = zeros(length, width,3);
 %P = zeros(length, width);
+Q = zeros(length, width);
+P = zeros(length, width);
 ixy = zeros(1,5);
 gxy = zeros(1,5);
 normal = zeros(length,width);
@@ -44,6 +46,8 @@ for i = 1:length,
         N =  gxy./g;
         p = N(1)/N(3);
         q = N(2)/N(3);
+	Q(i,j) = q;
+	P(i,j) = p;
          % CHECK
          %N(i,j,:) = (1/norm(G(i,j)))* G(i,j,:);
          %P(i,j) = N(i,j,1)/N(i,j,3);
@@ -56,10 +60,16 @@ image(normal);
 %y = 1:width;
 %[X,Y] = meshgrid(x,y);
 
-%Z = zeros(length, width);
-
-%for i=2:length,
-%   Z(i,1) = Z(i-1,1) + Q(i,j);
-%end
+% Create height map
+Z = zeros(length, width);
+% set initial height for each pixel in left column
+for i=2:length,
+   Z(i,1) = Z(i-1,1) + Q(i,1);
+end
+for i=1:length,
+	for j=2:width,
+		Z(i,j) = Z(i,j-1) + P(i,j)
+	end
+end
 
 %quiver3(X,Y,N(:,:,1),N(:,:,2), N(:,:,3))
