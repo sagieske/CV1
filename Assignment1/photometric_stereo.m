@@ -103,7 +103,7 @@ end
 %Before quiver3 can be used, a meshgrid must first be created.
 %This meshgrid runs from over the entire image length and width
 %in steps of 10.
-[x,y] = meshgrid(1:10:width, 1:10:length);
+[x,y] = meshgrid(1:20:width, 1:20:length);
 
 %Now, a height map must be made to store the height of the image.
 %The most left column is filled by setting the height value to the
@@ -144,8 +144,11 @@ for l = 1:size(x,1),
 	end
 end
 
-%Plotting the normal vectors
+%Plotting the normal vectors using quiver3 to show directions of 
+%vectors perpendicular to the surface
 quiver3(x, y, Z10, N10(:,:,1), N10(:,:,2), N10(:,:,3));
 
+%Plotting the reconstructed surface using a mesh, plots the 
+%reconstructed height of the surface
+mesh(x, y, Z10)
 
-%quiver3(X,Y,N(:,:,1),N(:,:,2), N(:,:,3))
