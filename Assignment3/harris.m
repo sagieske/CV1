@@ -1,4 +1,4 @@
-function Hmat = harris(image_path, sigma)
+function [Hmat,r,c] = harris(image_path, sigma, thresh,n)
     %Load image, change to grayscale double matrix
     im = im2double(rgb2gray(imread(image_path)));
     %Create 1d Gaussian filter
@@ -22,7 +22,24 @@ function Hmat = harris(image_path, sigma)
     B = conv2(im_xy, G);
     %Calculate cornerness of each pixel and store in Hmat
     Hmat = (A.*C - B.^2) - 0.04*((A+C).^2);
-    %Calculate maxima of Hmat in 2x2 direction
-    Bmat = imdilate(Hmat, true(2));
-    [r,c] = find(Bmat);
-    imshow(Bmat)
+    %Calculate maxima of Hmat in nxn window
+    Bmat = imdilate(Hmat, true(n));
+    %Define maxima in Hmat higher than threshold
+    cornerPoints = ((Hmat == Bmat) & (Hmat > thresh));
+    %Find rows, columns of cornerPoints
+    [r,c] = find(cornerPoints);
+    
+    subplot(1,2,1);
+    caption = sprintf('Ix');
+    imshow(im_x);
+    subplot(1,2,2);
+    caption = sprintf('Iy');
+    imshow(im_y);
+    caption = sprintf('Im + corners');
+    figure, imshowpair(im, cornerPoints);
+    figure, imshow(Bmat);
+
+    
+    
+    
+    
