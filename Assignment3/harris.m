@@ -35,11 +35,10 @@ function [Hmat,r,c] = harris(image_path, sigma, thresh,n)
     subplot(1,2,2);
     caption = sprintf('Iy');
     imshow(im_y);
-    caption = sprintf('Im + corners');
-    figure, imshowpair(im, cornerPoints);
-    figure, imshow(Bmat);
-
     
+    figure, imshow(im);
+    hold on;
+    plot(c,r, 'r.', 'MarkerSize', 20);
     
     
     
