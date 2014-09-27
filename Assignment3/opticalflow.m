@@ -31,8 +31,6 @@ function opticalflow(image_path1, image_path2, sigma, n)
     im_y = conv2(im, transpose(Gd),'same');
     %Get gradient with respect to time
     im_t = imabsdiff(im, im2);
-    figure, imshow(im_t);
-
     
     %Create blocks of image and corresponding blocks for derivatives
     im_x_blocks = mat2cell(im_x, x,y);
