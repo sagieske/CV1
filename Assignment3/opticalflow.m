@@ -1,6 +1,8 @@
-function opticalflow(image_path, sigma, n)
+function opticalflow(image_path1, image_path2, sigma, n)
     %Load image, change to grayscale double matrix
-    im = im2double(rgb2gray(imread(image_path)));
+    im = im2double(rgb2gray(imread(image_path1)));
+    im2 = im2double(rgb2gray(imread(image_path2)));
+
     %Create vector that describes block sizes at division by n
     x(1:floor(size(im,1)/n)) = n;
     y(1:floor(size(im,2)/n)) = n;
@@ -18,23 +20,32 @@ function opticalflow(image_path, sigma, n)
     im_x = conv2(im, Gd, 'same');
     %Convolve image with derivative of Gaussian in y-direction
     im_y = conv2(im, transpose(Gd),'same');
+    %Convolve image with respect to time???
+    im_t = conv2(im, im2, 'same');
     
     %Create blocks of image and corresponding blocks for derivatives
     im_x_blocks = mat2cell(im_x, x,y);
 	im_y_blocks = mat2cell(im_y, x,y);
+    im_t_blocks = mat2cell(im_y, x,y);
+
     
     %Loop over blocks, for every block calculate A
     for i=1:size(blocks,1),
         for j=1:size(blocks,2),
             %Get block for x and y gradient
             im_x_region = im_x_blocks{i,j};
-            im_y_region = im_y_blocks{i,j};  
-    
+            im_y_region = im_y_blocks{i,j};
+            im_t_region = im_t_blocks{i,j};  
             %Reshape to vectors
             im_x_region = reshape(im_x_region, numel(im_x_region), 1);
             im_y_region = reshape(im_y_region, numel(im_y_region), 1);
             %Create A
             A= [im_x_region im_y_region];
+            Atrans = transpose(A);
+            b = -1.* reshape(im_t_region, numel(im_t_region), 1);
+            a = A' * A;
+            ab = A' * b;
+            v = inv(a) * ab;
         end
     end
     
