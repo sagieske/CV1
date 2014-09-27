@@ -20,16 +20,20 @@ function opticalflow(image_path1, image_path2, sigma, n)
     im_x = conv2(im, Gd, 'same');
     %Convolve image with derivative of Gaussian in y-direction
     im_y = conv2(im, transpose(Gd),'same');
-    %Convolve image with respect to time???
-    im_t = conv2(im, im2, 'same');
+    %Get gradient with respect to time
+    im_t = imabsdiff(im, im2);
+    figure, imshow(im_t);
+
     
     %Create blocks of image and corresponding blocks for derivatives
     im_x_blocks = mat2cell(im_x, x,y);
 	im_y_blocks = mat2cell(im_y, x,y);
-    im_t_blocks = mat2cell(im_y, x,y);
+    im_t_blocks = mat2cell(im_t, x,y);
 
-    
+    %V_total = zeros(size(blocks,1)*size(blocks,2),4)
     %Loop over blocks, for every block calculate A
+    counter = 1;
+    V_total = zeros(numel(blocks), 4);
     for i=1:size(blocks,1),
         for j=1:size(blocks,2),
             %Get block for x and y gradient
@@ -41,15 +45,18 @@ function opticalflow(image_path1, image_path2, sigma, n)
             im_y_region = reshape(im_y_region, numel(im_y_region), 1);
             %Create A
             A= [im_x_region im_y_region];
-            Atrans = transpose(A);
+            %Create b
             b = -1.* reshape(im_t_region, numel(im_t_region), 1);
+            %Calculate v
             a = A' * A;
             ab = A' * b;
             v = inv(a) * ab;
+            %Add v to total matrix of v's
+            V_total(counter,:) = [i j v(1) v(2)];
+            counter = counter +1;
         end
     end
-    
-
-
-    
-    %B=blockproc(im, [n n], @(x) mean(x.data(:)))
+    %Plot Optical flow
+    % TODO: DOES NOT PLOT CORRECTLY? LOOKS SHIFTED. MAYBE GRADIENT IN TIME?
+    figure, quiver(V_total(:,1),V_total(:,2), V_total(:,3), V_total(:,4))
+   
