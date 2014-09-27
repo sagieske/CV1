@@ -1,7 +1,16 @@
 function opticalflow(image_path1, image_path2, sigma, n)
-    %Load image, change to grayscale double matrix
-    im = im2double(rgb2gray(imread(image_path1)));
-    im2 = im2double(rgb2gray(imread(image_path2)));
+    %Switch case for loading image due to different process pgm or ppm
+    %Load image and possibly change to grayscale double matrix
+    dot = regexp(image_path1,'\.');
+	switch(image_path1(dot+1:end))
+    case {'pgm'}
+        im = im2double(imread(image_path1));
+        im2 = im2double(imread(image_path2));
+    otherwise
+        im = im2double(rgb2gray(imread(image_path1)));
+        im2 = im2double(rgb2gray(imread(image_path2)));
+    end
+
 
     %Create vector that describes block sizes at division by n
     x(1:floor(size(im,1)/n)) = n;
