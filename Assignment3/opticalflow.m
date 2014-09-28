@@ -65,5 +65,11 @@ function opticalflow(image_path1, image_path2, sigma, n)
     end
     %Plot Optical flow
     % TODO: DOES NOT PLOT CORRECTLY? LOOKS SHIFTED. MAYBE GRADIENT IN TIME?
-    figure, quiver(V_total(:,1),V_total(:,2), V_total(:,3), V_total(:,4))
+    figure, imshow(im);
+    hold on;
+    quiver(V_total(:,2)*size(blocks,2),V_total(:,1)*size(blocks,1), V_total(:,3), V_total(:,4));
+    %figure, imshow(im_t);
+    %hold on;
+    %quiver(V_total(:,1)*size(blocks,1),V_total(:,2)*size(blocks,2), V_total(:,3), V_total(:,4));
+
    
