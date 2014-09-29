@@ -38,6 +38,8 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
             im_t = imabsdiff(images{i}, images{i+1});
             % Create block region for every interestpoint, with
             % interestpoint in middle
+            V_total = zeros(size(interestpoints,1), 4);
+            count = 1;
             for j=1:size(interestpoints,1)
                 r = interestpoints(j,1);
                 c = interestpoints(j,2);
@@ -53,21 +55,24 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
                     continue
                 else
                     %Get regions from x_derivative, y_derivative, t_derivative
-                    region_im_x = im_x(x_min:x_max, y_min:y_max)
-                    region_im_y = im_y(x_min:x_max, y_min:y_max)
-                    region_im_t = im_t(x_min:x_max, y_min:y_max)  
+                    region_im_x = im_x(x_min:x_max, y_min:y_max);
+                    region_im_y = im_y(x_min:x_max, y_min:y_max);
+                    region_im_t = im_t(x_min:x_max, y_min:y_max); 
                     %Calculate v
                     v =calculate_opticalflowmatrix(region_im_x, region_im_y, region_im_t)
-                    
-                    % TODO: recalculate interestpoint r,c and ccreate new
-                    % interestpoint matrix
-                    new_r = r+v(2)
-                    new_c = c+v(1)
-                    %Update interestpoints
-                    interestpoints(j,1) = new_c
-                    interestpoints(j,2) = new_r
+                    V_total(count, :) = [c r v(1) v(2)]
+                    %Update interestpoints with optical flow vectors. Round
+                    %the optical flow vectors to get new point
+                    interestpoints(j,1) = c+round(v(1));
+                    interestpoints(j,2) = r+round(v(2));
+                    count = count + 1;
                 end
             end
+            %Plot the optical flow
+            figure, imshow(images{i});
+            hold on;
+            midofblock = n_opticalflow/2
+            quiver(V_total(:,1),V_total(:,2), V_total(:,3), V_total(:,4));
             
             
             %opticalflow(imagefiles(i).name, imagefiles(i+2).name, sigma, n_opticalflow)
