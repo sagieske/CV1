@@ -58,6 +58,14 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
                     region_im_t = im_t(x_min:x_max, y_min:y_max)  
                     %Calculate v
                     v =calculate_opticalflowmatrix(region_im_x, region_im_y, region_im_t)
+                    
+                    % TODO: recalculate interestpoint r,c and ccreate new
+                    % interestpoint matrix
+                    new_r = r+v(2)
+                    new_c = c+v(1)
+                    %Update interestpoints
+                    interestpoints(j,1) = new_c
+                    interestpoints(j,2) = new_r
                 end
             end
             
