@@ -51,13 +51,14 @@ function opticalflow(image_path1, image_path2, sigma, n)
             im_x_region = reshape(im_x_region, numel(im_x_region), 1);
             im_y_region = reshape(im_y_region, numel(im_y_region), 1);
             %Create A
-            A= [im_x_region im_y_region];
+            %A= [im_x_region im_y_region];
             %Create b
-            b = -1.* reshape(im_t_region, numel(im_t_region), 1);
+            %b = -1.* reshape(im_t_region, numel(im_t_region), 1);
             %Calculate v
-            a = A' * A;
-            ab = A' * b;
-            v = inv(a) * ab;
+            %a = A' * A;
+            %ab = A' * b;
+            %v = inv(a) * ab;
+            v = calculate_opticalflowmatrix(im_x_region, im_y_region, im_t_region)
             %Add v to total matrix of v's
             V_total(counter,:) = [i j v(1) v(2)];
             counter = counter +1;
