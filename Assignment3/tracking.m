@@ -41,9 +41,9 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
             V_total = zeros(size(interestpoints,1), 4);
             count = 1;
             for j=1:size(interestpoints,1)
-                x_points = interestpoints(j,1);
-                size(interestpoints)
-                y_points = interestpoints(j,2);
+                %Get coordinates for current point of interest
+                x_points = interestpoints(j,1)
+                y_points = interestpoints(j,2)
                 % Calculate corner points of block region
                 y_min = y_points-(floor(n_opticalflow/2));
                 y_max = y_points+(floor(n_opticalflow/2));
@@ -64,7 +64,7 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
                     V_total(count, :) = [y_points x_points v(2) v(1)];
                     %Update interestpoints with optical flow vectors. Round
                     %the optical flow vectors to get new point
-                    interestpoints(j,1) = x_points + round(v(1))
+                    interestpoints(j,1) = x_points + round(v(1));
                     interestpoints(j,2) = y_points + round(v(2));
                     count = count + 1;
                 end
