@@ -66,7 +66,7 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
                 region_im_y = im_y(x_min:x_max, y_min:y_max)
                 region_im_t = im_t(x_min:x_max, y_min:y_max)  
                 %Calculate v
-                v =calculate_opticalflowmatrix(im_x_region, im_y_region, im_t_region)
+                v =calculate_opticalflowmatrix(region_im_x, region_im_y, region_im_t)
             end
             
             
