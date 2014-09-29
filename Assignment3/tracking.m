@@ -42,6 +42,7 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
             count = 1;
             for j=1:size(interestpoints,1)
                 x_points = interestpoints(j,1);
+                size(interestpoints)
                 y_points = interestpoints(j,2);
                 % Calculate corner points of block region
                 y_min = y_points-(floor(n_opticalflow/2));
@@ -59,12 +60,12 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
                     region_im_y = im_y(x_min:x_max, y_min:y_max);
                     region_im_t = im_t(x_min:x_max, y_min:y_max); 
                     %Calculate v
-                    v =calculate_opticalflowmatrix(region_im_x, region_im_y, region_im_t)
-                    V_total(count, :) = [x_points y_points v(1) v(2)]
+                    v = calculate_opticalflowmatrix(region_im_x, region_im_y, region_im_t)
+                    V_total(count, :) = [y_points x_points v(2) v(1)];
                     %Update interestpoints with optical flow vectors. Round
                     %the optical flow vectors to get new point
-                    interestpoints(j,1) = x_points+round(v(1));
-                    interestpoints(j,2) = y_points+round(v(2));
+                    interestpoints(j,1) = x_points + round(v(1))
+                    interestpoints(j,2) = y_points + round(v(2));
                     count = count + 1;
                 end
             end
@@ -72,7 +73,7 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
             figure, imshow(images{i});
             hold on;
             quiver(V_total(:,1),V_total(:,2), V_total(:,3), V_total(:,4));
-            plot(interestpoints(:,1),interestpoints(:,2), 'r.', 'MarkerSize', 10);
+            plot(interestpoints(:,2),interestpoints(:,1), 'r.', 'MarkerSize', 10);
 
             
             
