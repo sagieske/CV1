@@ -41,15 +41,35 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
             for j=1:size(interestpoints,1)
                 r = interestpoints(j,1);
                 c = interestpoints(j,2);
-                % Create window for 
-                x = c-(floor(n_opticalflow/2)):c+(floor(n_opticalflow/2))
-                y = r-(floor(n_opticalflow/2)):r+(floor(n_opticalflow/2))
-
-                %region_im_x = im_x(x,y);
+                % Calculate corner points of block region
+                x_min = c-(floor(n_opticalflow/2));
+                x_max = c+(floor(n_opticalflow/2));
+                y_min = r-(floor(n_opticalflow/2));
+                y_max = r+(floor(n_opticalflow/2));
+                
+                % Do not let block corner points be outside imagesize
+                if x_min < 1
+                    x_min = 1;
+                elseif x_max > size(images{i},1)
+                    x_max = size(images{i},1);
+                end
+                if y_min < 1
+                    y_min = 1;
+                elseif y_max > size(images{i},2)
+                    y_max = size(images{i},2);
+                end
+                x_min:x_max, y_min:y_max
+                sizex = size(im_x)
+                
+                %Get regions from x_derivative, y_derivative, t_derivative
+                region_im_x = im_x(x_min:x_max, y_min:y_max)
+                region_im_y = im_y(x_min:x_max, y_min:y_max)
+                region_im_t = im_t(x_min:x_max, y_min:y_max)  
+                %Calculate v
+                v =calculate_opticalflowmatrix(im_x_region, im_y_region, im_t_region)
             end
             
             
-            %calculate_opticalflowmatrix(im_x_region, im_y_region, im_t_region)
             %opticalflow(imagefiles(i).name, imagefiles(i+2).name, sigma, n_opticalflow)
         end
 
