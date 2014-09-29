@@ -23,7 +23,8 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
         interestpoints = [r c]
         size(interestpoints)
         %Loop through images to calculate flow?
-        for i=1:length(imagefiles)-1
+        %for i=1:length(imagefiles)-1
+        for i=1:4
             %calculate v matrix with point r,c as center??
             %Create 1d Gaussian filter
             G = gaussian(sigma);
@@ -41,6 +42,7 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
             V_total = zeros(size(interestpoints,1), 4);
             count = 1;
             for j=1:size(interestpoints,1)
+            %for j=1:2
                 r = interestpoints(j,1);
                 c = interestpoints(j,2);
                 % Calculate corner points of block region
@@ -71,8 +73,9 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
             %Plot the optical flow
             figure, imshow(images{i});
             hold on;
-            midofblock = n_opticalflow/2
             quiver(V_total(:,1),V_total(:,2), V_total(:,3), V_total(:,4));
+            plot(interestpoints(:,1),interestpoints(:,2), 'r.', 'MarkerSize', 10);
+
             
             
             %opticalflow(imagefiles(i).name, imagefiles(i+2).name, sigma, n_opticalflow)
