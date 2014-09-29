@@ -19,15 +19,17 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
 
         %Locate feature points for first frame
         [Hmat,r,c] = harris(imagefiles(1).name, sigma, thresh,n_harris);
-        interestpoints = [r c]
+        interestpoints = [r c];
         size(interestpoints)
         %Loop through images to calculate flow?
         %for i=1:length(imagefiles)-1
-        for i=1:4
+        writerObj = VideoWriter('peaks.avi');
+        open(writerObj);
+        for i=1:size(imagefiles)-1
             %calculate v matrix with point r,c as center??
             %Create 1d Gaussian filter
             G = gaussian(sigma);
-            x_range = -3*sigma:3*sigma;
+            x_range = -n_harris*sigma:n_harris*sigma;
             %Take the derivative of 1d Gaussian filter
             Gd = G' * (-(x_range/(sigma^2)));
             %Convolve image with derivative of Gaussian in x-direction
@@ -40,6 +42,7 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
             % interestpoint in middle
             V_total = zeros(size(interestpoints,1), 4);
             count = 1;
+            
             %Loop through interest points
             for j=1:size(interestpoints,1)
                 %Get coordinates for current point of interest
@@ -65,10 +68,7 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
                     V_total(count, :) = [y_points x_points v(2) v(1)];
                     %Update interestpoints with optical flow vectors. Round
                     %the optical flow vectors to get new point
-                    interestpoints(j,1)
                     interestpoints(j,1) = x_points + v(1);
-                    v(1)
-                    interestpoints(j,1)
                     interestpoints(j,2) = y_points + v(2);
                     count = count + 1;
                 end
@@ -78,12 +78,13 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
             hold on;
             quiver(V_total(:,1),V_total(:,2), V_total(:,3), V_total(:,4));
             plot(interestpoints(:,2),interestpoints(:,1), 'r.', 'MarkerSize', 10);
-
-            
+            F = getframe;
+            writeVideo(writerObj, F);
             
             %opticalflow(imagefiles(i).name, imagefiles(i+2).name, sigma, n_opticalflow)
         end
-
+        close(writerObj);
         %Return to previous path (for debugging)
         cd('../')
+        
     end
