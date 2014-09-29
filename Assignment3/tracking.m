@@ -47,26 +47,18 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
                 y_min = r-(floor(n_opticalflow/2));
                 y_max = r+(floor(n_opticalflow/2));
                 
-                % Do not let block corner points be outside imagesize
-                if x_min < 1
-                    x_min = 1;
-                elseif x_max > size(images{i},1)
-                    x_max = size(images{i},1);
+                % Do not let block corner points be outside imagesize,
+                % continue to next interespoint
+                if x_min < 1 || y_min <1 || y_max > size(images{i},2) || x_max > size(images{i},1)
+                    continue
+                else
+                    %Get regions from x_derivative, y_derivative, t_derivative
+                    region_im_x = im_x(x_min:x_max, y_min:y_max)
+                    region_im_y = im_y(x_min:x_max, y_min:y_max)
+                    region_im_t = im_t(x_min:x_max, y_min:y_max)  
+                    %Calculate v
+                    v =calculate_opticalflowmatrix(region_im_x, region_im_y, region_im_t)
                 end
-                if y_min < 1
-                    y_min = 1;
-                elseif y_max > size(images{i},2)
-                    y_max = size(images{i},2);
-                end
-                x_min:x_max, y_min:y_max
-                sizex = size(im_x)
-                
-                %Get regions from x_derivative, y_derivative, t_derivative
-                region_im_x = im_x(x_min:x_max, y_min:y_max)
-                region_im_y = im_y(x_min:x_max, y_min:y_max)
-                region_im_t = im_t(x_min:x_max, y_min:y_max)  
-                %Calculate v
-                v =calculate_opticalflowmatrix(region_im_x, region_im_y, region_im_t)
             end
             
             
