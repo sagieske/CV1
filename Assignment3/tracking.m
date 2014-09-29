@@ -18,7 +18,6 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
         end
 
         %Locate feature points for first frame
-        %TODO: A LOT OF FEATURE POINTS THAT ARE NOT THE BALL?
         [Hmat,r,c] = harris(imagefiles(1).name, sigma, thresh,n_harris);
         interestpoints = [r c]
         size(interestpoints)
@@ -42,14 +41,13 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
             V_total = zeros(size(interestpoints,1), 4);
             count = 1;
             for j=1:size(interestpoints,1)
-            %for j=1:2
-                r = interestpoints(j,1);
-                c = interestpoints(j,2);
+                x_points = interestpoints(j,1);
+                y_points = interestpoints(j,2);
                 % Calculate corner points of block region
-                x_min = c-(floor(n_opticalflow/2));
-                x_max = c+(floor(n_opticalflow/2));
-                y_min = r-(floor(n_opticalflow/2));
-                y_max = r+(floor(n_opticalflow/2));
+                y_min = y_points-(floor(n_opticalflow/2));
+                y_max = y_points+(floor(n_opticalflow/2));
+                x_min = x_points-(floor(n_opticalflow/2));
+                x_max = x_points+(floor(n_opticalflow/2));
                 
                 % Do not let block corner points be outside imagesize,
                 % continue to next interespoint
@@ -62,11 +60,11 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
                     region_im_t = im_t(x_min:x_max, y_min:y_max); 
                     %Calculate v
                     v =calculate_opticalflowmatrix(region_im_x, region_im_y, region_im_t)
-                    V_total(count, :) = [c r v(1) v(2)]
+                    V_total(count, :) = [x_points y_points v(1) v(2)]
                     %Update interestpoints with optical flow vectors. Round
                     %the optical flow vectors to get new point
-                    interestpoints(j,1) = c+round(v(1));
-                    interestpoints(j,2) = r+round(v(2));
+                    interestpoints(j,1) = x_points+round(v(1));
+                    interestpoints(j,2) = y_points+round(v(2));
                     count = count + 1;
                 end
             end
