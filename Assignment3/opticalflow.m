@@ -11,7 +11,6 @@ function opticalflow(image_path1, image_path2, sigma, n)
         im2 = im2double(rgb2gray(imread(image_path2)));
     end
 
-
     %Create vector that describes block sizes at division by n
     x(1:floor(size(im,1)/n)) = n;
     y(1:floor(size(im,2)/n)) = n;
@@ -19,7 +18,6 @@ function opticalflow(image_path1, image_path2, sigma, n)
     y(end+1) = rem(size(im,2),n);
     blocks = mat2cell(im, x, y);
 
-    
     %Create 1d Gaussian filter
     G = gaussian(sigma);
     x_range = -3*sigma:3*sigma;
@@ -37,41 +35,31 @@ function opticalflow(image_path1, image_path2, sigma, n)
 	im_y_blocks = mat2cell(im_y, x,y);
     im_t_blocks = mat2cell(im_t, x,y);
 
-    %V_total = zeros(size(blocks,1)*size(blocks,2),4)
-    %Loop over blocks, for every block calculate A
+    %Initialize matrix for i,j, v and initialize counter for row of this
+    %matrix
     counter = 1;
     V_total = zeros(numel(blocks), 4);
+    %Loop over blocks, for every block calculate v
     for i=1:size(blocks,1),
         for j=1:size(blocks,2),
             %Get block for x and y gradient
             im_x_region = im_x_blocks{i,j};
             im_y_region = im_y_blocks{i,j};
             im_t_region = im_t_blocks{i,j};  
-            %Reshape to vectors
-            im_x_region = reshape(im_x_region, numel(im_x_region), 1);
-            im_y_region = reshape(im_y_region, numel(im_y_region), 1);
-            %Create A
-            %A= [im_x_region im_y_region];
-            %Create b
-            %b = -1.* reshape(im_t_region, numel(im_t_region), 1);
             %Calculate v
-            %a = A' * A;
-            %ab = A' * b;
-            %v = inv(a) * ab;
-            v = calculate_opticalflowmatrix(im_x_region, im_y_region, im_t_region)
+            v = calculate_opticalflowmatrix(im_x_region, im_y_region, im_t_region);
             %Add v to total matrix of v's
             V_total(counter,:) = [i j v(1) v(2)];
             counter = counter +1;
         end
     end
-    %Plot Optical flow
-    % TODO: DOES NOT PLOT CORRECTLY? LOOKS SHIFTED. MAYBE GRADIENT IN TIME?
-    figure, imshow(im);
+    %Plot image
+    figure, imshow(imread(image_path1));
     hold on;
-    midofblock = size(blocks,2)/2
-    quiver(V_total(:,2)*size(blocks,2)-midofblock,V_total(:,1)*size(blocks,1)-midofblock, V_total(:,3), V_total(:,4));
-    %figure, imshow(im_t);
-    %hold on;
-    %quiver(V_total(:,1)*size(blocks,1),V_total(:,2)*size(blocks,2), V_total(:,3), V_total(:,4));
+    %Caculate middle of sliding window
+    midofblock = n/2;
+    %Plot opticalflow
+    quiver(V_total(:,1)*n-midofblock,V_total(:,2)*n-midofblock, V_total(:,3), V_total(:,4));
+
 
    
