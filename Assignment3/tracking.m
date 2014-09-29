@@ -20,13 +20,11 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
         %Locate feature points for first frame
         [Hmat,r,c] = harris(imagefiles(1).name, sigma, thresh,n_harris);
         interestpoints = [r c];
-        size(interestpoints)
-        %Loop through images to calculate flow?
-        %for i=1:length(imagefiles)-1
+        
         writerObj = VideoWriter('peaks.avi');
         open(writerObj);
+        %Loop through images to calculate flow
         for i=1:size(imagefiles)-1
-            %calculate v matrix with point r,c as center??
             %Create 1d Gaussian filter
             G = gaussian(sigma);
             x_range = -n_harris*sigma:n_harris*sigma;
@@ -38,8 +36,8 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
             im_y = conv2(images{i}, transpose(Gd),'same');
             %Get gradient with respect to time
             im_t = imabsdiff(images{i}, images{i+1});
-            % Create block region for every interestpoint, with
-            % interestpoint in middle
+            %Initialize V matrix to store v and corresponding coordinates,
+            %initialize counter for rows in V matrix
             V_total = zeros(size(interestpoints,1), 4);
             count = 1;
             
@@ -55,7 +53,7 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
                 x_max = x_points+(floor(n_opticalflow/2));
                 
                 % Do not let block corner points be outside imagesize,
-                % continue to next interespoint
+                % if so continue to next interespoint
                 if x_min < 1 || y_min <1 || y_max > size(images{i},2) || x_max > size(images{i},1)
                     continue
                 else
@@ -66,22 +64,21 @@ function tracking(image_path,sigma, thresh,n_harris, n_opticalflow)
                     %Calculate v
                     v = calculate_opticalflowmatrix(region_im_x, region_im_y, region_im_t)
                     V_total(count, :) = [y_points x_points v(2) v(1)];
-                    %Update interestpoints with optical flow vectors. Round
-                    %the optical flow vectors to get new point
+                    %Update interestpoints by adding the optical flow vectors.
                     interestpoints(j,1) = x_points + v(1);
                     interestpoints(j,2) = y_points + v(2);
                     count = count + 1;
                 end
             end
-            %Plot the optical flow
+            %Plot image as background
             figure, imshow(images{i});
             hold on;
+            %Plot the optical flow
             quiver(V_total(:,1),V_total(:,2), V_total(:,3), V_total(:,4));
             plot(interestpoints(:,2),interestpoints(:,1), 'r.', 'MarkerSize', 10);
             F = getframe;
             writeVideo(writerObj, F);
             
-            %opticalflow(imagefiles(i).name, imagefiles(i+2).name, sigma, n_opticalflow)
         end
         close(writerObj);
         %Return to previous path (for debugging)
