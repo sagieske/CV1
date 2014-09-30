@@ -18,6 +18,7 @@ function imagetransform(im1, im2, N)
         b = [];
         %Create A and b of match point and add to overall A and b
         for j=1:5
+            j = round(rand * N)+1;
             index1 = matches(1,j);
             index2 = matches(2,j);
             x = frames1(1,index1);
@@ -44,7 +45,7 @@ function imagetransform(im1, im2, N)
             x_prime_true = frames2(1,index2);
             y_prime_true = frames2(2,index2);
             %info_forplots(m,:) = [x, y, test(1), test(2), x_prime_true,y_prime_true]
-            x_distance = abs( x_prime_trans - x_prime_true);
+            x_distance = abs(x_prime_trans - x_prime_true);
             y_distance = abs(y_prime_trans - y_prime_true);
             if (x_distance < 11 && y_distance < 11)
                 inliers = inliers +1;
@@ -53,7 +54,7 @@ function imagetransform(im1, im2, N)
         if inliers > best_inliers;
             best_trans = transformationvector;
             best_inliers = inliers
-        rounded_coordinates = round(info_forplots)
+        rounded_coordinates = round(info_forplots);
         
         
         subplot(1,2,1);
