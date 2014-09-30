@@ -50,9 +50,26 @@ function imagetransform(im1, im2, N)
                 inliers = inliers +1;
             end
         end
-        if inliers > best_inliers
+        if inliers > best_inliers;
             best_trans = transformationvector;
             best_inliers = inliers
+        rounded_coordinates = round(info_forplots)
+        
+        
+        subplot(1,2,1);
+        imshow(im1);
+        hold on;
+        plot(rounded_coordinates(:,1),rounded_coordinates(:,2), 'r.', 'MarkerSize', 10);
+        hold off;
+        subplot(1,2,2);
+        imshow(im2);
+        ah=axes('position',[1,size(im1,1),1,size(im1,2)],'visible','off'); % <- select your pos...
+        size(rounded_coordinates,1)
+        for m=1:size(rounded_coordinates,1)
+            line([rounded_coordinates(m,1),rounded_coordinates(m,2)],[rounded_coordinates(m,1),rounded_coordinates(m,2)],'parent',ah,'linewidth',5);
+        end
+        
+
             
         %size(info_forplots)
         % plot correct x, y image 1
