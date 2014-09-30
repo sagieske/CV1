@@ -17,7 +17,7 @@ function imagetransform(im1, im2, N)
         A = [];
         b = [];
         %Create A and b of match point and add to overall A and b
-        for j=1:4
+        for j=1:5
             index1 = matches(1,j);
             index2 = matches(2,j);
             x = frames1(1,index1);
@@ -37,22 +37,23 @@ function imagetransform(im1, im2, N)
             y = frames1(2,index1);
             A = [x y 0 0 1 0; 0 0 x y 0 1];
             test = A * transformationvector;
-            x_prime = test(1);
-            y_prima = test(2);
+            x_prime_trans = test(1);
+            y_prime_trans = test(2);
             %Get true xprime yprime
             index2 = matches(2,m);
             x_prime_true = frames2(1,index2);
             y_prime_true = frames2(2,index2);
             %info_forplots(m,:) = [x, y, test(1), test(2), x_prime_true,y_prime_true]
-            x_distance = abs( x_prime - x_prime_true);
-            y_distance = abs(y_prime - y_prime_true);
+            x_distance = abs( x_prime_trans - x_prime_true);
+            y_distance = abs(y_prime_trans - y_prime_true);
             if (x_distance < 11 && y_distance < 11)
                 inliers = inliers +1;
             end
         end
-        if inliers > best_inliers;
+        if inliers > best_inliers
             best_trans = transformationvector;
-            best_inliers = inliers;
+            best_inliers = inliers
+            
         %size(info_forplots)
         % plot correct x, y image 1
         %subplot(1,2,1);
