@@ -8,7 +8,6 @@ function imagetransform(im1, im2, N)
     [frames2, desc2] = vl_sift(im2);
     %Set of supposed matches between region descriptors in each image
     [matches] = vl_ubcmatch(desc1, desc2);
-    size(matches);
     %Repeat N times
     best_trans = [];
     best_inliers = 0;
@@ -18,7 +17,14 @@ function imagetransform(im1, im2, N)
         b = [];
         %Create A and b of match point and add to overall A and b
         for j=1:5
-            j = round(rand * N)+1;
+            j = round(rand * N);
+            if j < 1
+                j = 1;
+            elseif j > size(matches,2)
+                j = size(matches,2);
+            end
+                
+                
             index1 = matches(1,j);
             index2 = matches(2,j);
             x = frames1(1,index1);
@@ -30,7 +36,6 @@ function imagetransform(im1, im2, N)
         end
         %Compute transformation vector
         transformationvector = pinv(A) * b;
-        %size(matches,2) 
         info_forplots = zeros(size(matches,2), 6);
         for m=1:size(matches,2)
             index1 = matches(1,m);
@@ -44,7 +49,6 @@ function imagetransform(im1, im2, N)
             index2 = matches(2,m);
             x_prime_true = frames2(1,index2);
             y_prime_true = frames2(2,index2);
-            %info_forplots(m,:) = [x, y, test(1), test(2), x_prime_true,y_prime_true]
             x_distance = abs(x_prime_trans - x_prime_true);
             y_distance = abs(y_prime_trans - y_prime_true);
             if (x_distance < 11 && y_distance < 11)
@@ -65,7 +69,7 @@ function imagetransform(im1, im2, N)
         subplot(1,2,2);
         imshow(im2);
         ah=axes('position',[1,size(im1,1),1,size(im1,2)],'visible','off'); % <- select your pos...
-        size(rounded_coordinates,1)
+        size(rounded_coordinates,1);
         for m=1:size(rounded_coordinates,1)
             line([rounded_coordinates(m,1),rounded_coordinates(m,2)],[rounded_coordinates(m,1),rounded_coordinates(m,2)],'parent',ah,'linewidth',5);
         end
