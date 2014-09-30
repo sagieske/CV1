@@ -8,7 +8,6 @@ function imagetransform(im1, im2, N)
     [frames2, desc2] = vl_sift(im2);
     %Set of supposed matches between region descriptors in each image
     [matches] = vl_ubcmatch(desc1, desc2);
-    size(matches);
     %Repeat N times
     best_trans = [];
     best_inliers = 0;
@@ -17,7 +16,15 @@ function imagetransform(im1, im2, N)
         A = [];
         b = [];
         %Create A and b of match point and add to overall A and b
-        for j=1:4
+        for j=1:5
+            j = round(rand * N);
+            if j < 1
+                j = 1;
+            elseif j > size(matches,2)
+                j = size(matches,2);
+            end
+                
+                
             index1 = matches(1,j);
             index2 = matches(2,j);
             x = frames1(1,index1);
@@ -29,7 +36,6 @@ function imagetransform(im1, im2, N)
         end
         %Compute transformation vector
         transformationvector = pinv(A) * b;
-        %size(matches,2) 
         info_forplots = zeros(size(matches,2), 6);
         for m=1:size(matches,2)
             index1 = matches(1,m);
@@ -37,8 +43,8 @@ function imagetransform(im1, im2, N)
             y = frames1(2,index1);
             A = [x y 0 0 1 0; 0 0 x y 0 1];
             test = A * transformationvector;
-            x_prime = test(1);
-            y_prima = test(2);
+            x_prime_trans = test(1);
+            y_prime_trans = test(2);
             %Get true xprime yprime
             index2 = matches(2,m);
             x_prime_true = frames2(1,index2);
@@ -50,14 +56,17 @@ function imagetransform(im1, im2, N)
                 inliers = inliers +1;
             end
         end
-        rounded_coordinates = round(info_forplots)
-        
-        
         if inliers > best_inliers;
-            best_trans = transformationvector;
-            best_inliers = inliers;
-
+            best_trans = transformationvector
+            best_inliers = inliers
+        rounded_coordinates = round(info_forplots);
+        
         end
+        size(im1)
+        size(best_trans)
+        tform = maketform('affine', best_trans);
+        im1_trans = imtransform(im1, tform);
+        imshow(im1_trans)
     end
     
     
