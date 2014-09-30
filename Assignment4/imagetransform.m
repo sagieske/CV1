@@ -56,7 +56,7 @@ function imagetransform(im1, im2, N)
             end
         end
         if inliers > best_inliers;
-            best_trans = transformationvector;
+            best_trans = transformationvector
             best_inliers = inliers
         rounded_coordinates = round(info_forplots);
         
@@ -102,6 +102,11 @@ function imagetransform(im1, im2, N)
         %end
         
         end
+        size(im1)
+        size(best_trans)
+        tform = maketform('affine', best_trans);
+        im1_trans = imtransform(im1, tform);
+        imshow(im1_trans)
     end
     
     
