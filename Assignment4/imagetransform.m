@@ -1,7 +1,18 @@
 function imagetransform(im1, im2, N)
-    im1 = im2single(rgb2gray(imread(im1)));
-    im2 = im2single(rgb2gray(imread(im2)));
-    
+    [pathstr,name,ext] = fileparts(im1);
+    if ext == '.pgm'
+        ext
+        im1 = im2single(imread(im1));
+        im2 = im2single(imread(im2));
+    else
+        im1 = im2single(rgb2gray(imread(im1)));
+        im2 = im2single(rgb2gray(imread(im2)));
+    end
+    figure;
+    subplot(1,2,1);
+    imshow(im1);
+    subplot(1,2,2);
+    imshow(im2);
     %Detect interest points in each image. Characterize the local
     %appearance of the regions around interest points 
     [frames1, desc1] = vl_sift(im1);
@@ -67,6 +78,7 @@ function imagetransform(im1, im2, N)
         [J, cdata, rdata] = imtransform(im1, best_tform);
         [K, cdata2, rdata2] = imtransform(im2, best_tform);
         rounded_coordinates = round(info_forplots);
+        figure;
         subplot(1,2,1);
         imshow(im1);
         subplot(1,2,2);
