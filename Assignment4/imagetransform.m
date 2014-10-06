@@ -1,4 +1,4 @@
-function imagetransform(im1, im2, N)
+function best_tform = imagetransform(im1, im2, N)
     [pathstr,name,ext] = fileparts(im1);
     if ext == '.pgm'
         ext
@@ -8,11 +8,13 @@ function imagetransform(im1, im2, N)
         im1 = im2single(rgb2gray(imread(im1)));
         im2 = im2single(rgb2gray(imread(im2)));
     end
-    figure;
-    subplot(1,2,1);
-    imshow(im1);
-    subplot(1,2,2);
-    imshow(im2);
+    %---UNCOMMENT FOR PLOTTING---%
+    %figure;
+    %subplot(1,2,1);
+    %imshow(im1);
+    %subplot(1,2,2);
+    %imshow(im2);
+    
     %Detect interest points in each image. Characterize the local
     %appearance of the regions around interest points 
     [frames1, desc1] = vl_sift(im1);
@@ -34,8 +36,6 @@ function imagetransform(im1, im2, N)
             elseif j > size(matches,2)
                 j = size(matches,2);
             end
-                
-                
             index1 = matches(1,j);
             index2 = matches(2,j);
             x = frames1(1,index1);
@@ -68,11 +68,11 @@ function imagetransform(im1, im2, N)
         end
         if inliers > best_inliers;
             best_trans = transformationvector;
-            best_inliers = inliers
+            best_inliers = inliers;
         best_A = [best_trans(1), best_trans(2), 0;
             best_trans(3), best_trans(4), 0;
             best_trans(5), best_trans(6), 1;
-            ]
+            ];
         end
         
         
@@ -117,13 +117,14 @@ function imagetransform(im1, im2, N)
         %end
 
     end
-    best_tform = maketform('affine', best_A)
+    best_tform = maketform('affine', best_A);
     [J, cdata, rdata] = imtransform(im1, best_tform);
     [K, cdata2, rdata2] = imtransform(im2, best_tform);
     rounded_coordinates = round(info_forplots);
-    figure;
-    subplot(1,2,1);
-    imshow(im1);
-    subplot(1,2,2);
-    imshow(K);
+    %---UNCOMMENT FOR PLOTTING---%
+    %figure;
+    %subplot(1,2,1);
+    %imshow(im1);
+    %subplot(1,2,2);
+    %imshow(K);
 end
