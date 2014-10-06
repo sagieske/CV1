@@ -1,5 +1,8 @@
 function imagestitching(im1, im2)
-    tform = imagetransform(im1, im2, 100);
+    %Get optimal transformation matrix for im1 and im2, 
+    %20 iterations in RANSAC should be enough
+    tform = imagetransform(im1, im2, 20);
+    %Load images
     [pathstr,name,ext] = fileparts(im1);
     if ext == '.pgm'
         ext
@@ -9,14 +12,14 @@ function imagestitching(im1, im2)
         im1 = im2single(rgb2gray(imread(im1)));
         im2 = im2single(rgb2gray(imread(im2)));
     end
+    %Transform second image
     transformed_im = imtransform(im2, tform);
-    trans2 = imtransform(im1, tform);
+    
     [frames1, desc1] = vl_sift(im1);
     [frames2, desc2] = vl_sift(transformed_im);
     %Set of supposed matches between region descriptors in each image
     [matches] = vl_ubcmatch(desc1, desc2)
-    frames1(matches(1,1))
-    frames2(matches(2,1))
+    
 
     start_x_array = ones(1,size(matches,2));
     start_y_array = ones(1,size(matches,2));
@@ -56,10 +59,4 @@ function imagestitching(im1, im2)
     % Substitute black pixels by original pixel in image 1
     newimage(partialimage < 1) = im1(partialimage < 1);    
     figure, imshow(newimage)   
-    %subplot(1,3,1);
-    %imshow(im1);
-    %hold off;
-    %subplot(1,3,2);
-    %imshow(transformed_im);
-    %subplot(1,3,3);
-    %imshow(im2);
+
