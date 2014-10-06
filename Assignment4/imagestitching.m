@@ -11,7 +11,9 @@ function imagestitching(im1, im2)
     end
     transformed_im = imtransform(im2, tform);
     figure,
-    subplot(1,2,1);
+    subplot(1,3,1);
     imshow(im1);
-    subplot(1,2,2);
+    subplot(1,3,2);
     imshow(transformed_im);
+    subplot(1,3,3);
+    imshow(im2);
