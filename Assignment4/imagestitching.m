@@ -58,15 +58,14 @@ function imagestitching(im1, im2)
     newimage(1:size(im1,1), 1:size(im1,2)) = im1;
     figure, imshow(newimage);
     newimage(x:x_2+x-1, y:y_2+y-1) = transformed_im;
-    figure, imshow(newimage)
-    %imtest(x:size(im1,1)-x,y:size(im2,1)-y) = im2(1:size(im1,1)-x, 1,1:size(im1,2)-y)
-    %imshow(imtest)
+
     
-    figure,
+    % Find all black spots
+    [r,c] = find(newimage==0)
+    newimage(transformed_im < 1) = im1(transformed_im < 1)    
+    figure, imshow(newimage)   
     %subplot(1,3,1);
-    imshow(im1);
-    hold on;
-    plot(start_x_array, start_y_array, 'r.', 'MarkerSize', 40);
+    %imshow(im1);
     %hold off;
     %subplot(1,3,2);
     %imshow(transformed_im);
