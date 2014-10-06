@@ -20,15 +20,8 @@ function imagestitching(im1, im2)
 
     start_x_array = ones(1,size(matches,2));
     start_y_array = ones(1,size(matches,2));
-    % Create 5 random match indices
+    % Calculate start x,y pixel of image 2 in image 1 for every match
     for j=1:size(matches,2)
-        % Get random match
-        %j = round(rand * size(matches,1));
-        %if j < 1
-        %    j = 1;
-        %elseif j > size(matches,2)
-        %    j = size(matches,2);
-        %end
          % Get index of first matches
         index1 = matches(1, j);
         index2 = matches(2, j);
@@ -43,26 +36,25 @@ function imagestitching(im1, im2)
         start_x_array(j) = new_x;
         start_y_array(j) = new_y;
     end
-    % x and y of highest frequency
-    y = mode(start_x_array)
-    x = mode(start_y_array)
+    % Get highest frequency of possible x,y start values
+    y = mode(start_x_array);
+    x = mode(start_y_array);
    
-    x_1 = size(im1, 1);
-    x_2 = size(transformed_im, 1);
-    x_length = max(x + x_2, x_1);
-    y_1 = size(im1, 2);
-    y_2 = size(transformed_im, 2);
-    y_length = max(y + y_2, y_1);
+    % Get size for new image
+    x_length = max(x + size(transformed_im,1), size(im1,1));
+    y_length = max(y + size(transformed_im,2), size(im1,2));
 
+    % Create new image
     newimage = zeros(x_length, y_length);
+    % Overlap image 1 in new image
     newimage(1:size(im1,1), 1:size(im1,2)) = im1;
-    figure, imshow(newimage);
-    newimage(x:x_2+x-1, y:y_2+y-1) = transformed_im;
+    % Overlape image 2 over new image + image 1
+    newimage(x:size(transformed_im,1)-1+x, y:size(transformed_im,2)-1+y) = transformed_im;
 
-    
-    % Find all black spots
-    [r,c] = find(newimage==0)
-    newimage(transformed_im < 1) = im1(transformed_im < 1)    
+    % Find all black pixels from image2 that overlapped image 1
+    partialimage = newimage(1:size(im1,1), 1:size(im1,2));
+    % Substitute black pixels by original pixel in image 1
+    newimage(partialimage < 1) = im1(partialimage < 1);    
     figure, imshow(newimage)   
     %subplot(1,3,1);
     %imshow(im1);
