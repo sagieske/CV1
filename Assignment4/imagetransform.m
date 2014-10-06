@@ -73,16 +73,7 @@ function imagetransform(im1, im2, N)
             best_trans(3), best_trans(4), 0;
             best_trans(5), best_trans(6), 1;
             ]
-        
-        best_tform = maketform('affine', best_A)
-        [J, cdata, rdata] = imtransform(im1, best_tform);
-        [K, cdata2, rdata2] = imtransform(im2, best_tform);
-        rounded_coordinates = round(info_forplots);
-        figure;
-        subplot(1,2,1);
-        imshow(im1);
-        subplot(1,2,2);
-        imshow(K);
+        end
         
         
         %subplot(1,2,1);
@@ -124,6 +115,15 @@ function imagetransform(im1, im2, N)
        % for k=1:numel(xa1)
         %    annotation('line',[xa1(k) xa2(k)],[ya1(k) ya2(k)],'color','r');
         %end
-        
-        end
+
     end
+    best_tform = maketform('affine', best_A)
+    [J, cdata, rdata] = imtransform(im1, best_tform);
+    [K, cdata2, rdata2] = imtransform(im2, best_tform);
+    rounded_coordinates = round(info_forplots);
+    figure;
+    subplot(1,2,1);
+    imshow(im1);
+    subplot(1,2,2);
+    imshow(K);
+end
